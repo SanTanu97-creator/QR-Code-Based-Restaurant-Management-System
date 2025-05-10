@@ -223,5 +223,3 @@ export const resetPassWord = async (req, res) => {
       });
   }
 };
-
-""

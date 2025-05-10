@@ -1,19 +1,20 @@
+// routes/adminDashboardRoutes.js
 import express from "express";
-const adminDashboardRouter = express.Router();
-
 import {
-  addNewFoodItem,
   dashboard,
-  deleteFoodItem,
+  addNewFoodItem,
   getAllFoodItems,
   updateFoodItem,
-} from "../controllers/adminDashBoard.js";
-import { authenticateUser } from "../middleware/adminAuthMiddleware.js";
+  deleteFoodItem,
+} from "../controllers/adminDashboard.js";
+import upload from "../middleware/multer.js";
 
-adminDashboardRouter.get("/", authenticateUser, dashboard);
-adminDashboardRouter.get("/all-food-items", authenticateUser, getAllFoodItems);
-adminDashboardRouter.post("/add-food", authenticateUser, addNewFoodItem);
-adminDashboardRouter.put("/update-food/:id", authenticateUser, updateFoodItem);
-adminDashboardRouter.delete("/delete-food/:id", authenticateUser, deleteFoodItem);
+const router = express.Router();
 
-export default adminDashboardRouter;
+router.get("/", dashboard);
+router.post("/add-food", upload.single("image"), addNewFoodItem);
+router.get("/foods", getAllFoodItems);
+router.put("/update-food/:id", updateFoodItem);
+router.delete("/delete-food/:id", deleteFoodItem);
+
+export default router;
