@@ -1,62 +1,11 @@
 import Food from "../model/foodModel.js";
-import cloudinary from "cloudinary";
+import cloudinary from "../config/cloudinaryConfig.js";
 import fs from "fs";
+
 // Admin Dashboard
 export const dashboard = (req, res) => {
   res.json({ success: true, message: "You are in the dashboard" });
 };
-
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-// Add New Food Item
-// export const addNewFoodItem = async (req, res) => {
-//   const {
-//     name,
-//     description,
-//     category,
-//     price,
-//     discount,
-//     imageUrl,
-//     ingredients,
-//     isVegetarian,
-//   } = req.body;
-
-//   if (!name || !description || !category || !price || !imageUrl) {
-//     return res
-//       .status(400)
-//       .json({ success: false, message: "Missing required details!" });
-//   }
-
-//   try {
-//     const newFoodItem = await Food.create({
-//       name,
-//       description,
-//       category,
-//       price,
-//       discount: discount || 0,
-//       imageUrl,
-//       ingredients: ingredients || [],
-//       isVegetarian: isVegetarian || false,
-//     });
-
-//     res.status(201).json({
-//       success: true,
-//       message: "Food item added successfully!",
-//       data: newFoodItem,
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: "Error adding food item",
-//       error: error.message,
-//     });
-//   }
-// };
 
 // Add New Food Item
 export const addNewFoodItem = async (req, res) => {
@@ -118,7 +67,6 @@ export const addNewFoodItem = async (req, res) => {
   }
 };
 
-
 // Get All Food Items
 export const getAllFoodItems = async (req, res) => {
   try {
@@ -176,22 +124,56 @@ export const updateFoodItem = async (req, res) => {
 };
 
 // Delete Food Item
+// export const deleteFoodItem = async (req, res) => {
+//   const { id } = req.params;
+
+//   try {
+//     const deletedFood = await Food.findByIdAndDelete(id);
+
+//     if (!deletedFood) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Food item not found!",
+//       });
+//     }
+
+//     res.status(200).json({
+//       success: true,
+//       message: "Food item deleted successfully!",
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: "Error deleting food item",
+//       error: error.message,
+//     });
+//   }
+// };
+
 export const deleteFoodItem = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const deletedFood = await Food.findByIdAndDelete(id);
+    // Find the food item by ID
+    const foodItem = await Food.findById(id);
 
-    if (!deletedFood) {
+    if (!foodItem) {
       return res.status(404).json({
         success: false,
         message: "Food item not found!",
       });
     }
 
+    // Delete the image from Cloudinary
+    const imagePublicId = foodItem.imageUrl.split("/").slice(-2, -1)[0]; // Extract public_id from imageUrl
+    await cloudinary.uploader.destroy(imagePublicId); // Delete the image from Cloudinary
+
+    // Delete the food item from the database
+    await Food.findByIdAndDelete(id);
+
     res.status(200).json({
       success: true,
-      message: "Food item deleted successfully!",
+      message: "Food item and image deleted successfully!",
     });
   } catch (error) {
     res.status(500).json({
