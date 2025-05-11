@@ -1,5 +1,5 @@
 
-export const wellcomeMail = (name, email) => ({
+export const welcomeMail = (name, email) => ({
   from: process.env.SENDER_EMAIL,
   to: email,
   subject: "🎉 Welcome to the Admin Panel - Your Account is Ready!",
@@ -27,7 +27,7 @@ export const wellcomeMail = (name, email) => ({
 });
 
 
-export const passwordRest = (email, otp) => ({
+export const passwordReset = (email, otp) => ({
   from: process.env.SENDER_EMAIL,
   to: email,
   subject: "🔒 Password Reset Request - OTP Verification",

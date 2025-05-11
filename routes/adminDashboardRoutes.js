@@ -7,13 +7,14 @@ import {
   deleteFoodItem,
 } from "../controllers/adminDashBoard.js";
 import upload from "../middleware/multer.js";
+import { authenticateUser } from "../middleware/adminAuthMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", dashboard);
-router.post("/add-food", upload.single("image"), addNewFoodItem);
-router.get("/foods", getAllFoodItems);
-router.put("/update-food/:id", updateFoodItem);
-router.delete("/delete-food/:id", deleteFoodItem);
+router.get("/", authenticateUser, dashboard);
+router.post("/add-food", authenticateUser, upload.single("image"), addNewFoodItem);
+router.get("/foods", authenticateUser, getAllFoodItems);
+router.put("/update-food/:id", authenticateUser, updateFoodItem);
+router.delete("/delete-food/:id", authenticateUser, deleteFoodItem);
 
 export default router;
